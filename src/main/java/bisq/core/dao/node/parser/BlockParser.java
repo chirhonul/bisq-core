@@ -39,6 +39,9 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Parse a rawBlock and creates a block from it with an empty tx list.
  * Iterates all rawTx and if the tx is a a BSQ tx it gets added to the tx list.
+ *
+ * todo(chirhonul): simplify. we have a clear RawBlock -> Block transformation as our job in this class,
+ * so why do we need to lean on bsqStateService and txParser?
  */
 @Slf4j
 @Immutable

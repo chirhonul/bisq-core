@@ -88,6 +88,9 @@ public class TxParser {
         for (int inputIndex = 0; inputIndex < tempTx.getTxInputs().size(); inputIndex++) {
             TxInput input = tempTx.getTxInputs().get(inputIndex);
             TxOutputKey outputKey = input.getConnectedTxOutputKey();
+            // todo(chirhonul): the .process() ends up looking up getUnspentTxOutput() using the input's (previous tx output) txid+index
+            // so bsqState's Map<TxOutputKey, TxOutput> unspentTxOutputMap can be checked to fetch the input's corresponding output
+            // and mess with parsingModel.burnBond(), bsqStateService.setSpentInfo(), bsqState.removeUnspentTxOutput()..
             txInputParser.process(outputKey, blockHeight, rawTx.getId(), inputIndex, parsingModel);
         }
 
