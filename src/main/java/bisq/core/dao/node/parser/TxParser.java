@@ -82,16 +82,21 @@ public class TxParser {
         int blockHeight = rawTx.getBlockHeight();
         // We could pass tx also to the sub validators but as long we have not refactored the validators to pure
         // functions lets use the parsingModel.
+        // todo(chirhonul): remove need for tempTx, if references to the immutable rawTx works everywhere below.
         TempTx tempTx = TempTx.fromRawTx(rawTx);
         ParsingModel parsingModel = new ParsingModel(tempTx);
 
         for (int inputIndex = 0; inputIndex < tempTx.getTxInputs().size(); inputIndex++) {
             TxInput input = tempTx.getTxInputs().get(inputIndex);
             TxOutputKey outputKey = input.getConnectedTxOutputKey();
-            // todo(chirhonul): the .process() ends up looking up getUnspentTxOutput() using the input's (previous tx output) txid+index
-            // so bsqState's Map<TxOutputKey, TxOutput> unspentTxOutputMap can be checked to fetch the input's corresponding output
-            // and mess with parsingModel.burnBond(), bsqStateService.setSpentInfo(), bsqState.removeUnspentTxOutput()..
-            txInputParser.process(outputKey, blockHeight, rawTx.getId(), inputIndex, parsingModel);
+            // todo(chirhonul): the .process() call below up looking up:
+            //   - getUnspentTxOutput() using the input's (which is another previous tx's output) txid+output index (aka outpoint)
+            //      so bsqState's Map<TxOutputKey, TxOutput> unspentTxOutputMap can be checked to fetch the input's corresponding output
+            //    - parsingModel.burnBond(), i.e. increase burntBondValue
+            //    - bsqStateService.setSpentInfo(), i.e add entry to Map<TxOutputKey, SpentInfo> spentInfoMap
+            //    - bsqState.removeUnspentTxOutput(), i.e. remove entry from Map<TxOutputKey, TxOutput> unspentTxOutputMap
+            // the parsingModel is created fresh on L81            txInputParser.process(outputKey, blockHeight, rawTx.getId(), inputIndex, parsingModel);
+            txInputParser.process(outputKey, blockHeight, tempTx.getId(), inputIndex, parsingModel);
         }
 
         final boolean leftOverBsq = parsingModel.isInputValuePositive();
