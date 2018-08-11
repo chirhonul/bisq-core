@@ -44,7 +44,7 @@ class ParsingModel {
     enum VoteRevealInputState {
         UNKNOWN, VALID, INVALID
     }
-    private TempTx tx;
+    private final TempTx tx;
     private long availableInputValue = 0;
     private long burntBondValue = 0;
     @Nullable
