@@ -136,6 +136,8 @@ public class PriceFeedService {
         return httpClient.getBaseUrl();
     }
 
+    // todo(chirhonul): would be good to not request real prices for dev work, to avoid dependency on internet connection
+    // and to lower risk of API provider blocking us.
     private void request(boolean repeatRequests) {
         if (requestTs == 0)
             log.info("request from provider {}",
@@ -156,6 +158,7 @@ public class PriceFeedService {
             boolean success = applyPriceToConsumer();
             if (success) {
                 final MarketPrice marketPrice = cache.get(currencyCode);
+                // todo(chirhonul): dump sample response here and provide it if useLocalPriceFeed is set?
                 if (marketPrice != null)
                     log.info("Received new {} from provider {} after {} sec.",
                             marketPrice,
@@ -240,6 +243,7 @@ public class PriceFeedService {
     }
 
     private void setBisqMarketPrice(String currencyCode, Price price) {
+        System.out.println("FIXME: PriceFeedService.setBisqMarketPrice(" + currencyCode + ", " + price + ")");
         if (!cache.containsKey(currencyCode) || !cache.get(currencyCode).isExternallyProvidedPrice()) {
             cache.put(currencyCode, new MarketPrice(currencyCode,
                     MathUtils.scaleDownByPowerOf10(price.getValue(), CurrencyUtil.isCryptoCurrency(currencyCode) ? 8 : 4),

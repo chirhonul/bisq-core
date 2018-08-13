@@ -53,6 +53,7 @@ import javax.annotation.Nullable;
 public final class PreferencesPayload implements PersistableEnvelope {
     private String userLanguage;
     private Country userCountry;
+
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private List<FiatCurrency> fiatCurrencies = new ArrayList<>();
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")

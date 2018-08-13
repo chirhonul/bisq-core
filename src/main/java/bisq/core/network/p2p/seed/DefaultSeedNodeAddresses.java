@@ -42,7 +42,8 @@ class DefaultSeedNodeAddresses {
 
             // regtest
             new NodeAddress("localhost:2002"),
-            new NodeAddress("localhost:3002"),
+            // fixme(chirhonul): allow configuration of this via commandline args or similar, commented out to avoid connection refused spam.
+            // new NodeAddress("localhost:3002"),
             /*    new NodeAddress("localhost:4002"),*/
 
             // LTC

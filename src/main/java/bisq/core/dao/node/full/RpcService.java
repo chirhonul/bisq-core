@@ -30,6 +30,8 @@ import bisq.common.util.Utilities;
 
 import org.bitcoinj.core.Utils;
 
+// todo(chirhonul): following log line is due to using old library:
+// Aug-13 13:31:08.177 [RpcService] WARN  c.n.b.c.c.ClientConfigurator: -- checkNodeVersion(..): server version mismatch - client optimized for '[0.10.0, 0.10.1, 0.10.2, 0.10.3]', node responded with '0.16.0'
 import com.neemre.btcdcli4j.core.BitcoindException;
 import com.neemre.btcdcli4j.core.CommunicationException;
 import com.neemre.btcdcli4j.core.client.BtcdClient;

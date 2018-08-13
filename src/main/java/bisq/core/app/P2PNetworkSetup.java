@@ -139,6 +139,8 @@ public class P2PNetworkSetup {
                 if (preferences.getUseTorForBitcoinJ())
                     initWalletServiceHandler.run();
 
+      //          if (preferences.getUseLocalPriceFeed())
+        //            priceFeedService.... // fixme(chirhonul)
                 // We want to get early connected to the price relay so we call it already now
                 priceFeedService.setCurrencyCodeOnInit();
                 priceFeedService.initialRequestPriceFeed();
