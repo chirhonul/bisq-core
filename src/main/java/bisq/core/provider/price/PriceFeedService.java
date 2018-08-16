@@ -405,9 +405,10 @@ public class PriceFeedService {
                     final Map<String, MarketPrice> priceMap = result.second;
 
                     cache.putAll(priceMap);
-                    for (Map.Entry<String, MarketPrice> entry : priceMap.entrySet()) {
-                        System.out.println("FIXME: " + entry.getKey() + ": " + entry.getValue());
-                    }
+                    //System.out.println("FIXME: currencyCode,price,timestampSec,isExternallyProvided");
+                    //for (Map.Entry<String, MarketPrice> entry : priceMap.entrySet()) {
+                    //    System.out.println("    " + entry.getValue().getCurrencyCode() + "," + entry.getValue().getPrice() + "," + entry.getValue().getTimestampSec() + "," + entry.getValue().isExternallyProvidedPrice());
+                    //}
 
                     resultHandler.run();
                 });

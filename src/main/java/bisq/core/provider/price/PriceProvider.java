@@ -37,6 +37,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+// todo(chirhonul): create MockPriceProvider that returns Map<String, MarketPrice> data from pricefeed.csv for development?
 @Slf4j
 public class PriceProvider extends HttpClientProvider {
 
