@@ -386,6 +386,7 @@ public class PriceFeedService {
     }
 
     private void requestAllPrices(PriceProvider provider, Runnable resultHandler, FaultHandler faultHandler) {
+        System.out.println("FIXME: requestAllPrices()");
         Log.traceCall();
         PriceRequest priceRequest = new PriceRequest();
         SettableFuture<Tuple2<Map<String, Long>, Map<String, MarketPrice>>> future = priceRequest.requestAllPrices(provider);
@@ -394,11 +395,19 @@ public class PriceFeedService {
             public void onSuccess(@Nullable Tuple2<Map<String, Long>, Map<String, MarketPrice>> result) {
                 UserThread.execute(() -> {
                     checkNotNull(result, "Result must not be null at requestAllPrices");
+                    System.out.println("FIXME: requestAllPrices onSuccess() got result: " + result);
+                    // todo(chirhonul): result here is tuple of first item:
+                    //   {'btcAverageTs': <ts>, 'poloniexTs': <ts>, 'coinmarketCapTs': <ts>}
+                    // and second item:
+                    //   {'FJD': MarketPrice(currencyCode=FJD, price=13637.84 timestampSec=<ts>,isExternallyProvidedPrice=true)
                     timeStampMap = result.first;
                     epochInSecondAtLastRequest = timeStampMap.get("btcAverageTs");
                     final Map<String, MarketPrice> priceMap = result.second;
 
                     cache.putAll(priceMap);
+                    for (Map.Entry<String, MarketPrice> entry : priceMap.entrySet()) {
+                        System.out.println("FIXME: " + entry.getKey() + ": " + entry.getValue());
+                    }
 
                     resultHandler.run();
                 });
