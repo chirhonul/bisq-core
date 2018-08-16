@@ -270,6 +270,7 @@ public class BsqWalletService extends WalletService implements BsqStateListener 
         availableBalance = bsqCoinSelector.select(NetworkParameters.MAX_MONEY,
                 wallet.calculateAllSpendCandidates()).valueGathered;
 
+        // todo(chirhonul): how can this happen? add check to verify it can't?
         if (availableBalance.isNegative())
             availableBalance = Coin.ZERO;
 
