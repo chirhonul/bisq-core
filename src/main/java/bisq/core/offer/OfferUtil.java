@@ -196,6 +196,10 @@ public class OfferUtil {
      * @param factor            The factor used for rounding. E.g. 1 means rounded to units of
      *                          1 EUR, 10 means rounded to 10 EUR, etc.
      * @return The adjusted amount
+     * todo(chirhonul): maybe factor should be a property that price knows about, since the Price already has
+     * information about whether it's an Altcoin or Fiat?
+     * todo(chirhonul): the maxTradeLimit should have a better type, like Coin?
+     * todo(chirhonul): rename to getRoundedAmount() for consistency?
      */
     @VisibleForTesting
     static Coin getAdjustedAmount(Coin amount, Price price, long maxTradeLimit, int factor) {
