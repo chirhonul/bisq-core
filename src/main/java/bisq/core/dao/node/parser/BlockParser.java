@@ -78,6 +78,9 @@ public class BlockParser {
      * @param rawBlock  Contains all transactions of a bitcoin block without any BSQ specific data
      * @return Block: Gets created from the rawBlock but contains only BSQ specific transactions.
      * @throws BlockNotConnectingException If new block does not connect to previous block
+     *
+     * todo(chirhonul): could make most of this method static, if it wasn't for needing the state
+     * of the txParser..
      */
     public Block parseBlock(RawBlock rawBlock) throws BlockNotConnectingException {
         int blockHeight = rawBlock.getHeight();
