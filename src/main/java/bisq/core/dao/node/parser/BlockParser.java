@@ -88,10 +88,12 @@ public class BlockParser {
         bsqStateService.onNewBlockHeight(blockHeight);
 
         // We create a block from the rawBlock but the transaction list is not set yet (is empty)
-        final Block block = new Block(blockHeight,
+        final Block block = new Block(
+                blockHeight,
                 rawBlock.getTime(),
                 rawBlock.getHash(),
-                rawBlock.getPreviousBlockHash());
+                rawBlock.getPreviousBlockHash()
+        );
 
         if (isBlockAlreadyAdded(rawBlock)) {
             //TODO check how/if that can happen
