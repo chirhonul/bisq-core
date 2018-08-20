@@ -49,6 +49,7 @@ public class Restrictions {
     public static Coin getMinTradeAmount() {
         if (MIN_TRADE_AMOUNT == null)
             switch (BisqEnvironment.getBaseCurrencyNetwork().getCurrencyCode()) {
+                // todo(chirhonul): remove non-BTC branches after merge to monorepo.
                 case "BTC":
                     MIN_TRADE_AMOUNT = Coin.valueOf(10_000); // 2 USD @ 20000 USD/BTC
                     break;
