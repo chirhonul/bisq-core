@@ -79,8 +79,17 @@ public class TxOutputParser {
                 // todo(chirhonul): we do mutate the TempTxOutput in here.
                 handleBsqOutput(txOutput, index, parsingModel, txOutputValue);
             } else {
-                // todo(chirhonul): we do mutate the TempTxOutput in here.
-                handleBtcOutput(txOutput, index, parsingModel);
+                boolean isCompRequestCandidate = parsingModel.getOpReturnTypeCandidate() == OpReturnType.COMPENSATION_REQUEST;
+                if (TxOutputParser.isBsqOutput(index, parsingModel.isInputValuePositive(), isCompRequestCandidate)) {
+                    // If we have BSQ left for burning and at the second output is a compensation request output we set the
+                    // candidate to the parsingModel and we don't apply the TxOutputType as we do that later as the OpReturn check.
+
+                    // We don't set the txOutputType yet as we have not fully validated the tx but put the candidate
+                    // into our parsingModel.
+                    parsingModel.setIssuanceCandidate(txOutput);
+                } else {
+                    txOutput.setTxOutputType(TxOutputType.BTC_OUTPUT);
+                }
             }
         } else {
             // We got a OP_RETURN output.
@@ -145,17 +154,14 @@ public class TxOutputParser {
         parsingModel.setBsqOutputFound(true);
     }
 
-    private void handleBtcOutput(TempTxOutput txOutput, int index, ParsingModel parsingModel) {
-        // If we have BSQ left for burning and at the second output a compensation request output we set the
-        // candidate to the parsingModel and we don't apply the TxOutputType as we do that later as the OpReturn check.
-        if (parsingModel.isInputValuePositive() &&
-                index == 1 &&
-                parsingModel.getOpReturnTypeCandidate() == OpReturnType.COMPENSATION_REQUEST) {
-            // We don't set the txOutputType yet as we have not fully validated the tx but put the candidate
-            // into our parsingModel.
-            parsingModel.setIssuanceCandidate(txOutput);
-        } else {
-            txOutput.setTxOutputType(TxOutputType.BTC_OUTPUT);
-        }
+    /**
+     * Whether the transaction output is a BSQ output or not.
+     *
+     * @param index           The index of the transaction output.
+     * @param valueIsPositive True if the output value is positive, false otherwise.
+     * @return                True if the output is a BSQ output, false if it is BTC.
+     */
+    private static boolean isBsqOutput(int index, boolean valueIsPositive, boolean compRequestCandidate) {
+        return valueIsPositive && index == 1 && compRequestCandidate;
     }
 }
