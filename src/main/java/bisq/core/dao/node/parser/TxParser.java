@@ -116,9 +116,13 @@ public class TxParser {
             // We use order of output index. An output is a BSQ utxo as long there is enough input value
             // We iterate all outputs including the opReturn to do a full validation including the BSQ fee
             for (int index = 0; index < outputs.size(); index++) {
-                // todo(chirhonul): we need TempTx not RawTx here since TxOutputParser.handleUnlockBondTx() mutates
-                // the TempTx to set its type. would be nice to pass back a result and not mutate if possible.
-                txOutputParser.processTxOutput(tempTx, outputs.get(index), index, parsingModel);
+                txOutputParser.processTxOutput(
+                        tempTx.getBlockHeight(),
+                        index == tempTx.getTempTxOutputs().size() - 1,
+                        outputs.get(index),
+                        index,
+                        parsingModel
+                );
             }
 
             // We don't allow multiple opReturn outputs (they are non-standard but to be safe lets check it)

@@ -76,8 +76,8 @@ public class OpReturnParser {
      *
      * @param opReturnData  The raw bytes of the OP_RETURN to parse.
      * @param nonZeroOutput If true, the output being parsed has a non-zero value.
-     * @param tx            The transaction that the output belongs to.
-     * @param index         The index of the output in the {@code tx}.
+     * @param lastOutput    If true, the output was the last one in the transaction.
+     * @param blockheight   The height of the block containing the tx.
      * @param bsqFee        The fee which should be paid in BSQ.
      * @param parsingModel  The parsing model.
      * @return              The type of the transaction output, which will be either one of the
@@ -86,48 +86,45 @@ public class OpReturnParser {
      *
      * todo(chirhonul): simplify signature by combining types: tx, nonZeroOutput, index, bsqFee, blockHeight all seem related
      */
-    public TxOutputType parseAndValidate(byte[] opReturnData, boolean nonZeroOutput, TempTx tx, int index, long bsqFee, ParsingModel parsingModel) {
-        if (nonZeroOutput ||
-                index != tx.getTempTxOutputs().size() - 1 ||
-                opReturnData.length < 1) {
-            log.warn("OP_RETURN data does not match our rules. opReturnData={}",
-                    tx, Utils.HEX.encode(opReturnData));
+    public TxOutputType parseAndValidate(byte[] opReturnData, boolean nonZeroOutput, boolean lastOutput, int blockheight, long bsqFee, ParsingModel parsingModel) {
+        if (nonZeroOutput || !lastOutput || opReturnData.length < 1) {
+            log.warn("OP_RETURN data does not match our rules. opReturnData={}", Utils.HEX.encode(opReturnData));
             return TxOutputType.UNDEFINED;
         }
         final Optional<OpReturnType> optionalOpReturnType = OpReturnType.getOpReturnType(opReturnData[0]);
         if (!optionalOpReturnType.isPresent()) {
-            // TODO add exception?
-            log.warn("OP_RETURN data does not match our defined types. opReturnData={}",
-                    tx, Utils.HEX.encode(opReturnData));
+            // TODO(chirhonul): should raise exception? then caller can log info about the raw tx.
+            log.warn("OP_RETURN data does not match our defined types. opReturnData={}", Utils.HEX.encode(opReturnData));
             return TxOutputType.UNDEFINED;
         }
-        TxOutputType outputType = selectValidator(opReturnData, tx, bsqFee, parsingModel, optionalOpReturnType.get());
+        TxOutputType outputType = selectValidator(opReturnData, blockheight, bsqFee, parsingModel, optionalOpReturnType.get());
         return outputType;
     }
 
-    // todo(chirhonul): drop tx arg, we only need blockheight
-    private TxOutputType selectValidator(byte[] opReturnData, TempTx tx, long bsqFee,
+    private TxOutputType selectValidator(byte[] opReturnData, int blockheight, long bsqFee,
                                  ParsingModel parsingModel, OpReturnType opReturnType) {
         TxOutputType outputType = TxOutputType.UNDEFINED;
         switch (opReturnType) {
             case PROPOSAL:
-                outputType = processProposal(opReturnData, bsqFee, tx.getBlockHeight(), parsingModel);
+                outputType = processProposal(opReturnData, bsqFee, blockheight, parsingModel);
                 break;
             case COMPENSATION_REQUEST:
-                outputType = processCompensationRequest(opReturnData, bsqFee, tx.getBlockHeight(), parsingModel);
+                outputType = processCompensationRequest(opReturnData, bsqFee, blockheight, parsingModel);
                 break;
             case BLIND_VOTE:
-                outputType = processBlindVote(opReturnData, bsqFee, tx.getBlockHeight(), parsingModel);
+                outputType = processBlindVote(opReturnData, bsqFee, blockheight, parsingModel);
                 break;
             case VOTE_REVEAL:
-                outputType = processVoteReveal(opReturnData, tx.getBlockHeight(), parsingModel);
+                outputType = processVoteReveal(opReturnData, blockheight, parsingModel);
                 break;
             case LOCKUP:
-                outputType = processLockup(opReturnData, tx.getBlockHeight(), parsingModel);
+                outputType = processLockup(opReturnData, blockheight, parsingModel);
                 break;
             default:
                 // Should never happen as long we keep OpReturnType entries in sync with out switch case.
-                final String msg = "Unsupported OpReturnType. tx=" + tx +
+                // todo(chirhonul): should raise? then we can go back to logging what tx consists of
+                // where we catch the exception.
+                final String msg = "Unsupported OpReturnType. tx at height=" + blockheight +
                         "; opReturnData=" + Utils.HEX.encode(opReturnData);
                 log.error(msg);
                 DevEnv.logErrorAndThrowIfDevMode(msg);

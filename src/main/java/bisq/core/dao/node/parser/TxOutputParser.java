@@ -55,7 +55,16 @@ public class TxOutputParser {
         opReturnParser.processOpReturnCandidate(txOutput, parsingModel);
     }
 
-    void processTxOutput(TempTx tx, TempTxOutput txOutput, int index, ParsingModel parsingModel) {
+    /**
+     *
+     * @param blockheight
+     * @param lastOutput
+     * @param txOutput
+     * @param index
+     * @param parsingModel
+     * todo(chirhonul): try to not use TempTxOutput if not necessary.
+     */
+    void processTxOutput(int blockheight, boolean lastOutput, TempTxOutput txOutput, int index, ParsingModel parsingModel) {
         final long bsqInputBalanceValue = parsingModel.getAvailableInputValue();
         // We do not check for pubKeyScript.scriptType.NULL_DATA because that is only set if dumpBlockchainData is true
         final byte[] opReturnData = txOutput.getOpReturnData();
@@ -76,8 +85,8 @@ public class TxOutputParser {
             TxOutputType outputType = opReturnParser.parseAndValidate(
                     opReturnData,
                     txOutput.getValue() != 0,
-                    tx,
-                    index,
+                    lastOutput,
+                    blockheight,
                     bsqInputBalanceValue,
                     parsingModel
             );
