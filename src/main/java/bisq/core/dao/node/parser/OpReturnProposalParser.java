@@ -50,7 +50,7 @@ public class OpReturnProposalParser {
         if (!isInPhase)
             log.warn("Not in PROPOSAL phase. blockHeight={}", blockHeight);
         boolean isFeeCorrect = fee == bsqStateService.getParamValue(Param.PROPOSAL_FEE, blockHeight);
-        if (!isFeeCorrect)
+        if (!isFeeCorrect) // todo(chirhonul): should this raise? when can this happen legitimately?
             log.warn("Invalid fee. used fee={}, required fee={}", fee, bsqStateService.getParamValue(Param.PROPOSAL_FEE, blockHeight));
         return opReturnData.length == 22 &&
                 isFeeCorrect &&
