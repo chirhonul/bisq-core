@@ -79,7 +79,6 @@ public class OpReturnParser {
      * @param tx            The transaction that the output belongs to.
      * @param index         The index of the output in the {@code tx}.
      * @param bsqFee        The fee which should be paid in BSQ.
-     * @param blockHeight   The height of the block that includes {@code tx}.
      * @param parsingModel  The parsing model.
      * @return              The type of the transaction output, which will be either one of the
      *                          {@code *_OP_RETURN_OUTPUT} values, or {@code UNDEFINED} in case of
@@ -87,8 +86,7 @@ public class OpReturnParser {
      *
      * todo(chirhonul): simplify signature by combining types: tx, nonZeroOutput, index, bsqFee, blockHeight all seem related
      */
-    public TxOutputType parseAndValidate(byte[] opReturnData, boolean nonZeroOutput, TempTx tx, int index, long bsqFee,
-                         int blockHeight, ParsingModel parsingModel) {
+    public TxOutputType parseAndValidate(byte[] opReturnData, boolean nonZeroOutput, TempTx tx, int index, long bsqFee, ParsingModel parsingModel) {
         if (nonZeroOutput ||
                 index != tx.getTempTxOutputs().size() - 1 ||
                 opReturnData.length < 1) {
@@ -103,28 +101,29 @@ public class OpReturnParser {
                     tx, Utils.HEX.encode(opReturnData));
             return TxOutputType.UNDEFINED;
         }
-        TxOutputType outputType = selectValidator(opReturnData, tx, bsqFee, blockHeight, parsingModel, optionalOpReturnType.get());
+        TxOutputType outputType = selectValidator(opReturnData, tx, bsqFee, parsingModel, optionalOpReturnType.get());
         return outputType;
     }
 
-    private TxOutputType selectValidator(byte[] opReturnData, TempTx tx, long bsqFee, int blockHeight,
+    // todo(chirhonul): drop tx arg, we only need blockheight
+    private TxOutputType selectValidator(byte[] opReturnData, TempTx tx, long bsqFee,
                                  ParsingModel parsingModel, OpReturnType opReturnType) {
         TxOutputType outputType = TxOutputType.UNDEFINED;
         switch (opReturnType) {
             case PROPOSAL:
-                outputType = processProposal(opReturnData, bsqFee, blockHeight, parsingModel);
+                outputType = processProposal(opReturnData, bsqFee, tx.getBlockHeight(), parsingModel);
                 break;
             case COMPENSATION_REQUEST:
-                outputType = processCompensationRequest(opReturnData, bsqFee, blockHeight, parsingModel);
+                outputType = processCompensationRequest(opReturnData, bsqFee, tx.getBlockHeight(), parsingModel);
                 break;
             case BLIND_VOTE:
-                outputType = processBlindVote(opReturnData, bsqFee, blockHeight, parsingModel);
+                outputType = processBlindVote(opReturnData, bsqFee, tx.getBlockHeight(), parsingModel);
                 break;
             case VOTE_REVEAL:
-                outputType = processVoteReveal(opReturnData, blockHeight, parsingModel);
+                outputType = processVoteReveal(opReturnData, tx.getBlockHeight(), parsingModel);
                 break;
             case LOCKUP:
-                outputType = processLockup(opReturnData, blockHeight, parsingModel);
+                outputType = processLockup(opReturnData, tx.getBlockHeight(), parsingModel);
                 break;
             default:
                 // Should never happen as long we keep OpReturnType entries in sync with out switch case.
