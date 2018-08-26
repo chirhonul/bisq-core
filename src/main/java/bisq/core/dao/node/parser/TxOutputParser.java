@@ -67,24 +67,25 @@ public class TxOutputParser {
     void processTxOutput(int blockheight, boolean lastOutput, TempTxOutput txOutput, int index, ParsingModel parsingModel) {
         final long bsqInputBalanceValue = parsingModel.getAvailableInputValue();
         // We do not check for pubKeyScript.scriptType.NULL_DATA because that is only set if dumpBlockchainData is true
-        final byte[] opReturnData = txOutput.getOpReturnData();
-        if (opReturnData == null) {
+        if (!txOutput.hasOpReturnData()) {
             final long txOutputValue = txOutput.getValue();
-            if (isUnlockBondTx(txOutput, index, parsingModel)) {
+            if (isUnlockBondTx(txOutput.getValue(), index, parsingModel)) {
                 // We need to handle UNLOCK transactions separately as they don't follow the pattern on spending BSQ
                 // The LOCKUP BSQ is burnt unless the output exactly matches the input, that would cause the
                 // output to not be BSQ output at all
+                // todo(chirhonul): we do mutate the TempTxOutput in here.
                 handleUnlockBondTx(txOutput, parsingModel);
             } else if (bsqInputBalanceValue > 0 && bsqInputBalanceValue >= txOutputValue) {
+                // todo(chirhonul): we do mutate the TempTxOutput in here.
                 handleBsqOutput(txOutput, index, parsingModel, txOutputValue);
             } else {
+                // todo(chirhonul): we do mutate the TempTxOutput in here.
                 handleBtcOutput(txOutput, index, parsingModel);
             }
         } else {
             // We got a OP_RETURN output.
             TxOutputType outputType = opReturnParser.parseAndValidate(
-                    opReturnData,
-                    txOutput.getValue() != 0,
+                    txOutput, // todo: TempTxOutput is not modified in here
                     lastOutput,
                     blockheight,
                     bsqInputBalanceValue,
@@ -98,12 +99,12 @@ public class TxOutputParser {
         return txOutput.getOpReturnData() != null;
     }
 
-    private boolean isUnlockBondTx(TempTxOutput txOutput, int index, ParsingModel parsingModel) {
+    private boolean isUnlockBondTx(long outputValue, int index, ParsingModel parsingModel) {
         // We require that the input value is exact the available value and the output value
         return parsingModel.getSpentLockupTxOutput() != null &&
                 index == 0 &&
-                parsingModel.getSpentLockupTxOutput().getValue() == txOutput.getValue() &&
-                parsingModel.getAvailableInputValue() == txOutput.getValue();
+                parsingModel.getSpentLockupTxOutput().getValue() == outputValue &&
+                parsingModel.getAvailableInputValue() == outputValue;
     }
 
     private void handleUnlockBondTx(TempTxOutput txOutput, ParsingModel parsingModel) {

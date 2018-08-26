@@ -74,8 +74,8 @@ public class OpReturnParser {
     /**
      * Parse the type of OP_RETURN data and validate it.
      *
-     * @param opReturnData  The raw bytes of the OP_RETURN to parse.
-     * @param nonZeroOutput If true, the output being parsed has a non-zero value.
+     * @param txOutput      The temporary transaction output to parse.
+     * @param lastOutput    If true, the output being parsed has a non-zero value.
      * @param lastOutput    If true, the output was the last one in the transaction.
      * @param blockheight   The height of the block containing the tx.
      * @param bsqFee        The fee which should be paid in BSQ.
@@ -86,7 +86,9 @@ public class OpReturnParser {
      *
      * todo(chirhonul): simplify signature by combining types: tx, nonZeroOutput, index, bsqFee, blockHeight all seem related
      */
-    public TxOutputType parseAndValidate(byte[] opReturnData, boolean nonZeroOutput, boolean lastOutput, int blockheight, long bsqFee, ParsingModel parsingModel) {
+    public TxOutputType parseAndValidate(TempTxOutput txOutput, boolean lastOutput, int blockheight, long bsqFee, ParsingModel parsingModel) {
+        boolean nonZeroOutput = txOutput.getValue() != 0;
+        byte[] opReturnData = txOutput.getOpReturnData();
         if (nonZeroOutput || !lastOutput || opReturnData.length < 1) {
             log.warn("OP_RETURN data does not match our rules. opReturnData={}", Utils.HEX.encode(opReturnData));
             return TxOutputType.UNDEFINED;

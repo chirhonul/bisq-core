@@ -69,6 +69,15 @@ public abstract class BaseTxOutput {
         this.blockHeight = blockHeight;
     }
 
+    /**
+     * Whether the tx output has OP_RETURN data.
+     *
+     * @return True iff the output has OP_RETURN data.
+     */
+    public boolean hasOpReturnData() {
+        return this.getOpReturnData() != null;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     // PROTO BUFFER
