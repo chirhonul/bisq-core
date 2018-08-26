@@ -98,11 +98,23 @@ public class OpReturnParser {
             log.warn("OP_RETURN data does not match our defined types. opReturnData={}", Utils.HEX.encode(opReturnData));
             return TxOutputType.UNDEFINED;
         }
-        TxOutputType outputType = selectValidator(opReturnData, blockheight, bsqFee, parsingModel, optionalOpReturnType.get());
+        TxOutputType outputType = validate(opReturnData, blockheight, bsqFee, parsingModel, optionalOpReturnType.get());
         return outputType;
     }
 
-    private TxOutputType selectValidator(byte[] opReturnData, int blockheight, long bsqFee,
+    /**
+     * Validate that the OP_RETURN data is correct for specified type.
+     *
+     * @param opReturnData The raw OP_RETURN data.
+     * @param blockheight  The height of the block of the transaction with the OP_RETURN
+     * @param bsqFee       The fee in BSQ for the operation.
+     * @param parsingModel The parsing model.
+     * @param opReturnType The type of the OP_RETURN operation.
+     * @return             The type of transaction output, which will be either one of the
+     *                          {@code *_OP_RETURN_OUTPUT} values, or {@code UNDEFINED} in case of
+     *                          unexpected state.
+     */
+    private TxOutputType validate(byte[] opReturnData, int blockheight, long bsqFee,
                                  ParsingModel parsingModel, OpReturnType opReturnType) {
         TxOutputType outputType = TxOutputType.UNDEFINED;
         switch (opReturnType) {
@@ -134,8 +146,19 @@ public class OpReturnParser {
         return outputType;
     }
 
+    /**
+     *
+     * @param opReturnData
+     * @param bsqFee
+     * @param blockHeight
+     * @param parsingModel
+     * @return
+     *
+     * todo(chirhonul): drop parsingModel entirely, by either returning the OpReturnType.PROPOSAL or
+     * inferring that this is the verified OP_RETURN type in the caller.
+     */
     private TxOutputType processProposal(byte[] opReturnData, long bsqFee, int blockHeight, ParsingModel parsingModel) {
-        if (opReturnProposalParser.validate(opReturnData, bsqFee, blockHeight, parsingModel)) {
+        if (opReturnProposalParser.validate(opReturnData, bsqFee, blockHeight, null)) {
             parsingModel.setVerifiedOpReturnType(OpReturnType.PROPOSAL);
             return TxOutputType.PROPOSAL_OP_RETURN_OUTPUT;
         } else {

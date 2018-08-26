@@ -94,7 +94,7 @@ public class TxOutputParser {
         } else {
             // We got a OP_RETURN output.
             TxOutputType outputType = opReturnParser.parseAndValidate(
-                    txOutput, // todo: TempTxOutput is not modified in here
+                    txOutput, // todo: TempTxOutput is not modified in here, could use immutable TxOutput
                     lastOutput,
                     blockheight,
                     bsqInputBalanceValue,
