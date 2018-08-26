@@ -76,7 +76,6 @@ public class OpReturnParser {
      *
      * @param txOutput      The temporary transaction output to parse.
      * @param lastOutput    If true, the output being parsed has a non-zero value.
-     * @param lastOutput    If true, the output was the last one in the transaction.
      * @param blockheight   The height of the block containing the tx.
      * @param bsqFee        The fee which should be paid in BSQ.
      * @param parsingModel  The parsing model.
@@ -84,7 +83,7 @@ public class OpReturnParser {
      *                          {@code *_OP_RETURN_OUTPUT} values, or {@code UNDEFINED} in case of
      *                          unexpected state.
      *
-     * todo(chirhonul): simplify signature by combining types: tx, nonZeroOutput, index, bsqFee, blockHeight all seem related
+     * todo(chirhonul): simplify signature by combining types: txOutput, lastOutput, bsqFee, blockHeight all seem related
      */
     public TxOutputType parseAndValidate(TempTxOutput txOutput, boolean lastOutput, int blockheight, long bsqFee, ParsingModel parsingModel) {
         boolean nonZeroOutput = txOutput.getValue() != 0;
