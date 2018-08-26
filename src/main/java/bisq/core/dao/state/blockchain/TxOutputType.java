@@ -21,6 +21,9 @@ import bisq.common.proto.ProtoUtil;
 
 import io.bisq.generated.protobuffer.PB;
 
+/**
+ * A type of Bitcoin output that's relevant for the bisq dao.
+ */
 public enum TxOutputType {
     UNDEFINED,
     GENESIS_OUTPUT,
