@@ -401,6 +401,10 @@ public class VoteResultService implements BsqStateListener, DaoSetupService {
         //TODO impl
     }
 
+
+    // todo(chirhonul): this method fetches the data for the proposals table in the DAO UI..
+    // it would be great to be able to test the input -> output mapping of this method for
+    // integration / functional tests!
     private List<EvaluatedProposal> getEvaluatedProposals(Set<DecryptedVote> decryptedVotes,
                                                           int chainHeight) {
         // We reorganize the data structure to have a map of proposals with a list of VoteWithStake objects
